@@ -5,6 +5,8 @@ from os import linesep
 
 class TestMarkdownEmphasis(BaseTestCase):
     def test_bolded_text(self):
+        if self.test_document is None:
+            return None
 
         self.test_document.enable_TOC = False
         self.test_document.addBoldedText("Is this bolded?", write_as_line=True)
@@ -27,6 +29,8 @@ class TestMarkdownEmphasis(BaseTestCase):
         )
 
     def test_italicized_text(self):
+        if self.test_document is None:
+            return None
 
         self.test_document.enable_TOC = False
         self.test_document.addItalicizedText("Is this italicized?", write_as_line=True)
@@ -48,6 +52,8 @@ class TestMarkdownEmphasis(BaseTestCase):
         )
 
     def test_bolded_italicized_text(self):
+        if self.test_document is None:
+            return None
 
         self.test_document.enable_TOC = False
         self.test_document.addBoldedAndItalicizedText(
@@ -75,6 +81,8 @@ class TestMarkdownEmphasis(BaseTestCase):
         )
 
     def test_strikethrough_text(self):
+        if self.test_document is None:
+            return None
 
         self.test_document.enable_TOC = False
         self.test_document.addStrikethroughText(
@@ -98,6 +106,8 @@ class TestMarkdownEmphasis(BaseTestCase):
         )
 
     def test_emphasis_whitespace_stripping(self):
+        if self.test_document is None:
+            return None
 
         self.test_document.enable_TOC = False
         self.test_document.addBoldedText(

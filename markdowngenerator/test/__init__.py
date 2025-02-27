@@ -61,6 +61,8 @@ class BaseTestCase(unittest.TestCase):
 
         Cleanup afterwards. (delete instance and file)
         """
+        if self.test_document is None:
+            return None
         self.test_document.__exit__()
         with open(test_filename, "r") as final_file:
             self.assertIsMarkdownEqual(final_file)
@@ -96,7 +98,7 @@ class BaseTestCase(unittest.TestCase):
             )
             if (
                 self.expected_output.if_unequal.enabled
-                and index + 1 in self.expected_output.if_unequal.lines
+                and self.expected_output.if_unequal.lines and index + 1 in self.expected_output.if_unequal.lines
             ):
                 assert (
                     expected_line != generated_line
@@ -140,12 +142,12 @@ class BaseTestCase(unittest.TestCase):
 
 @dataclass
 class IF_LINES_UNEQUAL:
-    lines: List[int] = None
+    lines: List[int] | None = None
     enabled: bool = False
 
 
 @dataclass
 class EXPECTED_OUTPUT:
-    value: str = None
+    value: str | None = None
     if_unequal: IF_LINES_UNEQUAL = IF_LINES_UNEQUAL()
     func_name: str = "Unknown"

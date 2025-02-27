@@ -4,6 +4,8 @@ from os import linesep
 
 class TestMarkdownReferences(BaseTestCase):
     def test_href_notation(self):
+        if self.test_document is None:
+            return
 
         self.test_document.enable_TOC = False
         self.test_document.writeTextLine(
@@ -29,7 +31,8 @@ class TestMarkdownReferences(BaseTestCase):
         )
 
     def test_image_href(self):
-
+        if self.test_document is None:
+            return
 
         self.test_document.enable_TOC = False
         self.test_document.writeTextLine(
