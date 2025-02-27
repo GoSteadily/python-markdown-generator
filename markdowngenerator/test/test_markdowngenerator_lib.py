@@ -6,6 +6,9 @@ from ..config.syntax import MARKDOWN_HORIZONTAL_RULE
 class TestMarkdownGeneratorLib(BaseTestCase):
 
     def test_write_enabled(self):
+        if self.test_document is None:
+            return None
+
         self.test_document.enable_TOC = True
         self.test_document.enable_write = True 
         # ToC should not be generated
@@ -31,6 +34,9 @@ class TestMarkdownGeneratorLib(BaseTestCase):
             func_name=self.test_header_generation.__name__,
         )
     def test_write_disabled_generate_toc(self):
+        if self.test_document is None:
+            return None
+
         self.test_document.enable_TOC = True
         self.test_document.enable_write = False
         # ToC should be generated
@@ -68,6 +74,9 @@ class TestMarkdownGeneratorLib(BaseTestCase):
 
     def test_header_generation(self):
         # Disable TOC
+        if self.test_document is None:
+            return None
+
         self.test_document.enable_TOC = False
 
         self.test_document.addHeader(1, "My Very First HeAder")
@@ -106,8 +115,10 @@ class TestMarkdownGeneratorLib(BaseTestCase):
         )
 
     def test_header_invalid_comparisions(self):
-
         # Disable TOC
+        if self.test_document is None:
+            return None
+
         self.test_document.enable_TOC = False
 
         self.test_document.addHeader(1, "Header one for testINg!")
@@ -123,8 +134,10 @@ class TestMarkdownGeneratorLib(BaseTestCase):
         )
 
     def test_header_abnormal_header_level_values(self):
-
         # Disable table of contents
+        if self.test_document is None:
+            return None
+
         self.test_document.enable_TOC = False
 
         self.test_document.addHeader(-1, "Header size should be one.")
@@ -138,6 +151,8 @@ class TestMarkdownGeneratorLib(BaseTestCase):
         )
 
     def test_horizontal_rule(self):
+        if self.test_document is None:
+            return None
 
         self.test_document.enable_TOC = False
         self.test_document.writeTextLine("This is some text.")

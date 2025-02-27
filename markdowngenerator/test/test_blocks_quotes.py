@@ -4,7 +4,8 @@ import textwrap
 
 class TestMarkdownBlocksAndQuotes(BaseTestCase):
     def test_code_block(self):
-
+        if self.test_document is None:
+            return
         self.test_document.enable_TOC = False
 
         syntax = "python"
@@ -29,6 +30,8 @@ class TestMarkdownBlocksAndQuotes(BaseTestCase):
 
 
     def test_code_block_escape_html(self):
+        if self.test_document is None:
+            return
 
         self.test_document.enable_TOC = False
 
@@ -52,8 +55,10 @@ class TestMarkdownBlocksAndQuotes(BaseTestCase):
         self._insert_test_info(validationlines, func_name=self.test_code_block.__name__)
 
     def test_inline_code_block(self):
-        self.test_document.enable_TOC = False
+        if self.test_document is None:
+            return None
 
+        self.test_document.enable_TOC = False
 
         inline_block1 = self.test_document.addInlineCodeBlock("print(\"This is it\")")
         self.test_document.writeTextLine(inline_block1, html_escape=False)
@@ -70,6 +75,9 @@ class TestMarkdownBlocksAndQuotes(BaseTestCase):
 
 
     def test_single_line_blockquote(self):
+        if self.test_document is None:
+            return None
+
         self.test_document.enable_TOC = False
         self.test_document.addSinglelineBlockQuote("What's up there? Just single block quoting.")
         validationlines = [

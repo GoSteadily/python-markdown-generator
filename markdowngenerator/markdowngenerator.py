@@ -171,9 +171,10 @@ class MarkdownGenerator:
             else:
                 self.logger.warning("Warning: ToC is not enabled when the file is dynamically written.")
         # Everything will be written at once into the file
-        if not self.enable_write:
-            self.document.writelines(self.document_data_array)
-        self.document.close()
+        if self.document:
+            if not self.enable_write:
+                self.document.writelines(self.document_data_array)
+            self.document.close()
 
     def genFootNotes(self, genHeader=False):
         """
@@ -185,7 +186,7 @@ class MarkdownGenerator:
             for footnote in self.pending_footnote_references:
                 self.writeTextLine(footnote)
 
-        if self.unfinished_details_summary_count.get("value") > 0:
+        if self.unfinished_details_summary_count.get("value", 0) > 0:
             self.logger.warning("Some of the detail blocks is not properly closed!!!")
 
     def genTableOfContent(self, linenumber=TABLE_OF_CONTENT_LINE_POSITION, max_depth=3):
@@ -242,11 +243,11 @@ class MarkdownGenerator:
         """
         if html_escape:
             self.document_data_array.append(escape(str(text)))
-            if self.enable_write:
+            if self.enable_write and self.document:
                 self.document.write(escape(str(text)))
             return
         self.document_data_array.append(str(text))
-        if self.enable_write:
+        if self.enable_write and self.document:
             self.document.write(str(text))
 
     def writeTextLine(self, text=None, html_escape: bool = True):
@@ -266,17 +267,17 @@ class MarkdownGenerator:
         if text is None:
             # Just forcing new line, in Markdown there should be 2 or more spaces as well
             self.document_data_array.append(str("  ") + linesep)
-            if self.enable_write:
+            if self.enable_write and self.document:
                 self.document.write(str("  ") + linesep)
 
             return
         if html_escape:
             self.document_data_array.append(escape(str(text)) + "  " + linesep)
-            if self.enable_write:
+            if self.enable_write and self.document:
                 self.document.write(escape(str(text)) + "  " + linesep)
             return
         self.document_data_array.append(str(text) + "  " + linesep)
-        if self.enable_write:
+        if self.enable_write and self.document:
             self.document.write(str(text) + "  " + linesep)
 
     def writeAttributeValuePairLine(self, key_value_pair: tuple, total_padding=30):
@@ -465,7 +466,7 @@ class MarkdownGenerator:
         """
         self.writeTextLine(f"{linesep}{HORIZONTAL_RULE}{linesep}")
 
-    def addCodeBlock(self, text, syntax: str = None, escape_html: bool = False):
+    def addCodeBlock(self, text, syntax: str = "", escape_html: bool = False):
         """
         Standard Markdown
 
@@ -565,7 +566,7 @@ class MarkdownGenerator:
 
     def addTable(
         self,
-        header_names: List[str] = None,
+        header_names: List[str] | None = None,
         row_elements=None,
         alignment="center",
         dictionary_list=None,
@@ -624,66 +625,68 @@ class MarkdownGenerator:
                 )
                 return
         try:
-            for header in header_names:
-                # Capitalize header names
-                if capitalize_headers:
-                    self.writeText(f"| {header.capitalize()} ")
-                else:
-                    self.writeText(f"| {header} ")
+            if header_names:
+                for header in header_names:
+                    # Capitalize header names
+                    if capitalize_headers:
+                        self.writeText(f"| {header.capitalize()} ")
+                    else:
+                        self.writeText(f"| {header} ")
         except TypeError as e:
             self.logger.error(f"Invalid header names for table. Not generated: {e}")
             return
         # Write ending vertical bar
-        self.writeTextLine(f"|")
+        self.writeTextLine("|")
         # Write dashes to separate headers
         if alignment == "left":
-            self.writeTextLine("".join(["|", ":---|" * len(header_names)]))
+            self.writeTextLine("".join(["|", ":---|" * len(header_names or [])]))
 
         elif alignment == "center":
-            self.writeTextLine("".join(["|", ":---:|" * len(header_names)]))
+            self.writeTextLine("".join(["|", ":---:|" * len(header_names or [])]))
 
         elif alignment == "right":
-            self.writeTextLine("".join(["|", "---:|" * len(header_names)]))
+            self.writeTextLine("".join(["|", "---:|" * len(header_names or [])]))
         else:
             self.logger.warning("Invalid alignment value in addTable. Using default.")
-            self.writeTextLine("".join(["|", ":---:|" * len(header_names)]))
+            self.writeTextLine("".join(["|", ":---:|" * len(header_names or [])]))
 
         # Write each row into the table
 
         if not useDictionaryList:
+            if row_elements:
+                for row in row_elements:
+                    if len(row) > len(header_names or []):
+                        self.logger.error(
+                            f"The are more row elements than header names (Row: {len(row)} - Header: {len(header_names or [])} "
+                        )
+                        continue
+                    for element in row:
+                        # Check if element is list
+                        # If it is, add it as by line by line into single cell
+                        if isinstance(element, list):
+                            self.writeText("| ")
+                            for list_str in element:
+                                self.writeText(list_str)
+                                self.writeText("<br> ", html_escape=False)
+                        else:
+                            self.writeText(f"| {element} ", html_escape)
 
-            for row in row_elements:
-                if len(row) > len(header_names):
-                    self.logger.error(
-                        f"The are more row elements than header names (Row: {len(row)} - Header: {len(header_names)} "
-                    )
-                    continue
-                for element in row:
-                    # Check if element is list
-                    # If it is, add it as by line by line into single cell
-                    if isinstance(element, list):
-                        self.writeText("| ")
-                        for list_str in element:
-                            self.writeText(list_str)
-                            self.writeText("<br> ", html_escape=False)
-                    else:
-                        self.writeText(f"| {element} ", html_escape)
-
-                self.writeTextLine(f"|")
+                    self.writeTextLine("|")
 
         else:
             # Iterate over list of dictionaries
             # One row contains attributes of dictionary
-            for row in dictionary_list:
-                for key in row.keys():
-                    if isinstance(row.get(key), list):
-                        self.writeText("| ")
-                        for list_str in row.get(key):
-                            self.writeText(list_str)
-                            self.writeText("<br> ", html_escape=False)
-                    else:
-                        self.writeText(f"| {row.get(key)} ", html_escape)
-                self.writeTextLine(f"|")
+            if dictionary_list:
+                for row in dictionary_list:
+                    for key in row.keys():
+                        if isinstance(row.get(key), list):
+                            self.writeText("| ")
+                            for list_str in row.get(key):
+                                self.writeText(list_str)
+                                self.writeText("<br> ", html_escape=False)
+                        else:
+                            self.writeText(f"| {row.get(key)} ", html_escape)
+                    self.writeTextLine("|")
         self.writeTextLine()
 
     def insertDetailsAndSummary(
