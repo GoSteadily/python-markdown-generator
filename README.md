@@ -8,6 +8,16 @@ It aims to bring a modular approach for dynamically building pure (with some exc
 [![codecov](https://codecov.io/gh/Nicceboy/python-markdown-generator/branch/master/graph/badge.svg)](https://codecov.io/gh/Nicceboy/python-markdown-generator)
 [![License](https://img.shields.io/badge/license-MIT-black.svg)](https://opensource.org/licenses/MIT)
 
+
+## Quick Install
+
+Python 3.7+ is required.
+
+You can install the latest version from the GitHub by using pip:
+```shell
+uv add git+https://github.com/GoSteadily/python-markdown-generator
+```
+
 ## But why?
 
 In most cases, Markdown is finally converted into HTML markup language, and there are already multiple libraries for dynamically generating HTML output. Markdown was created initially as a lightweight, user-friendly, user-written text formatting markup language to produce rich text format by using a plain text editor, and the existence of this kind of library might be against the original purpose of the language.
@@ -24,15 +34,6 @@ At the time of starting making this library, no complete existing similar librar
 
 > This is **not** yet-another-Markdown-to-HTML conversion tool.
 
-
-## Quick Install
-
-Python 3.7+ is required.
-
-You can install the latest version from the GitHub by using pip:
-```shell
-pip3 install git+https://github.com/Nicceboy/python-markdown-generator
-```
 
 ## Quick usage
 
